@@ -1,0 +1,54 @@
+{
+  "name": "almosanada-package",
+  "version": "1.0.0",
+  "description": "test speed type writing application for arabic language",
+  "license": "ISC",
+  "author": "almosanada",
+  "type": "commonjs",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-builder"
+  },
+  "build": {
+    "appId": "com.almosanada.typingtest",
+    "productName": "Typing Speed Test",
+    "copyright": "Copyright © 2025 Almosanada",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "index.html",
+      "main.js",
+      "index.js",
+      "style.css",
+      "preload.js",
+      "renderer.js",
+      "assets/**/*",
+      "node_modules/**/*",
+      "!**/*.map",
+      "!**/test",
+      "!**/__tests__",
+      "!**/examples"
+    ],
+    "asar": true,
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^7.9.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.9.0",
+    "electron": "^38.2.1",
+    "electron-builder": "^26.0.12"
+  },
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.1"
+  }
+}
