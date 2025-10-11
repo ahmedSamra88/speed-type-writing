@@ -1,3 +1,4 @@
 ﻿# speed-type-writing
-use electronjs frame work  to create exe file
+use electronjs framework  to create exe file
+
 
