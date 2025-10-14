@@ -25,7 +25,7 @@ const timerText = document.getElementById('timerText');
 const circle = document.querySelector('.circle-progress');
 const resetBtn = document.getElementById('resetBtn');
 const saveBtn = document.getElementById('saveBtn');
-
+let isModalOpened;
 let minutes;
 let allChars;
 let currentIndex;
@@ -37,6 +37,7 @@ let timerInterval;
 let sourceText;
 let spaceCounter;
 function resetValues(){
+   isModalOpened=false;
    minutes=10;
    allChars = [];
    currentIndex = 0;
@@ -57,6 +58,29 @@ function setProgress(percent) {
   const offset = circumference - (percent / 100) * circumference;
   circle.style.strokeDashoffset = offset;
 }
+function splitArabicText(text) {
+  const compositePairs = ['لأ', 'لإ', 'لآ' // main lam+alif combos
+  ];
+
+  const chars = [];
+  let i = 0;
+
+  while (i < text.length) {
+    const twoChar = text.slice(i, i + 2);
+
+    // If two letters form a composite, push them as one
+    if (compositePairs.includes(twoChar)) {
+      chars.push(twoChar);
+      i += 2;
+    } else {
+      chars.push(text[i]);
+      i++;
+    }
+  }
+
+  return chars;
+}
+
 function initTest() {
   resetValues();
   sourceText = texts[Math.floor(Math.random() * texts.length)];
@@ -65,7 +89,10 @@ function initTest() {
   words.forEach(word => {
     const wordSpan = document.createElement('span');
     wordSpan.classList.add('word');
-    for (const ch of word) {
+    
+  // 👇 Use the function here to split word properly
+  const chars = splitArabicText(word);
+    for (const ch of chars) {
       const span = document.createElement('span');
       
       span.textContent = ch;
@@ -91,8 +118,24 @@ function highlightCurrent() {
   allChars.forEach(c => c.classList.remove('active'));
   if (allChars[currentIndex]) allChars[currentIndex].classList.add('active');
 }
+let isShift=false
+let compositKey='';
 document.addEventListener('keydown', e => {
+  if(isModalOpened) return;
   const key = e.key;
+  if(isShift){
+    if(key==='ل'){
+        compositKey ='لأ';     
+    }else if(key==='ف'){
+      compositKey="لإ";
+    }else if(key==='غ'){
+      compositKey="لا";
+    }else if(e.keyCode == 66){
+      compositKey="لآ";
+    }      
+      isShift=!isShift;
+  }
+  if(key === "Shift") isShift=true;
     // منع Enter من تفعيل الأزرار
   if (e.key === "Enter" && e.target.tagName === "BUTTON")  e.preventDefault();
     // prevent space from scrolling
@@ -104,13 +147,12 @@ document.addEventListener('keydown', e => {
   const currentCharEl = allChars[currentIndex];
   if (!currentCharEl) return;
 
-  if (key === currentCharEl.textContent) {
+  if (key === currentCharEl.textContent ||  compositKey === currentCharEl.textContent) {
     currentCharEl.classList.remove('wrong');
     currentCharEl.classList.add('correct');
     if(currentCharEl.textContent == " ")
       {
         spaceCounter++;
-        console.log(spaceCounter);
       }
     correctCount++;
     currentIndex++;
@@ -176,10 +218,19 @@ function showResultModal() {
   document.getElementById('resWpm').textContent = wpmEl.textContent;
   const modal = new bootstrap.Modal(document.getElementById('resultModal'));
   modal.show();
+  isModalOpened=true;
 }
 
-resetBtn.addEventListener('click', () => initTest());
+resetBtn.addEventListener('click', () =>  {
+  resetTimer(minutes);
+  initTest();
+});
 
+// عند إغلاق المودال
+document.addEventListener('hidden.bs.modal', () => {
+  resetTimer(minutes);
+  initTest();
+});
 saveBtn.addEventListener('click', () => {
   const result = {
     text: sourceText,

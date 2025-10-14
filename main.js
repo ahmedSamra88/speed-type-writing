@@ -1,25 +1,34 @@
-const { app, BrowserWindow } = require('electron/main')
+const { app, BrowserWindow, Menu, screen } = require('electron');
+const path = require('path');
 
-const createWindow = () => {
+function createWindow() {
+  // Get the primary display size (for any monitor / screen)
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+
   const win = new BrowserWindow({
-    fullscreen: true 
-  })
+    width,
+    height,
+    frame: true,               // keep the title bar and Close (X)
+    resizable: true,          // disable resize
+    minimizable: true,        // hide minimize
+    maximizable: true,        // hide maximize
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+    },
+  });
 
-  win.loadFile('index.html')
+  // Remove top menu completely
+  Menu.setApplicationMenu(null);
+
+  // Load your app
+  win.loadFile('index.html');
+
+  // Position the window to fill the whole screen
+  win.setBounds({ x: 0, y: 0, width, height });
 }
 
-app.whenReady().then(() => {
-  createWindow()
-
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow()
-    }
-  })
-})
+app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
-})
+  if (process.platform !== 'darwin') app.quit();
+});
