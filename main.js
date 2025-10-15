@@ -12,6 +12,7 @@ function createWindow() {
     resizable: true,          // disable resize
     minimizable: true,        // hide minimize
     maximizable: true,        // hide maximize
+    icon: path.join(__dirname, 'assets', 'logo.ico'), // 👈 هنا الأيقونة
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },

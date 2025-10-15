@@ -35,7 +35,7 @@
     "asar": true,
     "win": {
       "target": "nsis",
-      "icon": "assets/icon.ico"
+      "icon": "assets/logo.ico"
     },
     "nsis": {
       "oneClick": false,
